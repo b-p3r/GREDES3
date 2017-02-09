@@ -71,8 +71,8 @@ public class MOTableBuilder implements MOGroup{
 	public void addRowValue(Variable variable) {
 		
 		tableRows.add(new Variable[2]);
-		tableRows.get(currentRow)[UminhoGrMib.idxIndexRandHexNumber] = new Integer32(currentRow+1);
-		tableRows.get(currentRow)[UminhoGrMib.idxRandomHexadecimalNumber] = variable;
+		tableRows.get(currentRow)[idxIndexRandHexNumber] = new Integer32(currentRow+1);
+		tableRows.get(currentRow)[idxRandomHexadecimalNumber] = variable;
 
 		currentRow++;
 

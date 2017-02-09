@@ -6,8 +6,6 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 
-import di.uminho.miei.gredes.UminhoGrMib;
-
 public class UnpredictableTableEntryRow extends DefaultMOMutableRow2PC {
 
 	
@@ -19,29 +17,29 @@ public class UnpredictableTableEntryRow extends DefaultMOMutableRow2PC {
 
 	public Integer32 getIndexRandHexNumber() {
 		
-		return (Integer32) super.getValue(UminhoGrMib.idxIndexRandHexNumber);
+		return (Integer32) super.getValue(MOTableBuilder.idxIndexRandHexNumber);
 	}
 
 	public void setIndexRandHexNumber(Integer32 newColValue) {
 		
-		super.setValue(UminhoGrMib.idxIndexRandHexNumber, newColValue);
+		super.setValue(MOTableBuilder.idxIndexRandHexNumber, newColValue);
 	}
 
 	public OctetString getRandomHexadecimalNumber() {
-		return (OctetString) super.getValue(UminhoGrMib.idxRandomHexadecimalNumber);
+		return (OctetString) super.getValue(MOTableBuilder.idxRandomHexadecimalNumber);
 	}
 
 	public void setRandomHexadecimalNumber(OctetString newColValue) {
 	
-		super.setValue(UminhoGrMib.idxRandomHexadecimalNumber, newColValue);
+		super.setValue(MOTableBuilder.idxRandomHexadecimalNumber, newColValue);
 	}
 
 	public Variable getValue(int column) {
 		
 		switch (column) {
-		case UminhoGrMib.idxIndexRandHexNumber:
+		case MOTableBuilder.idxIndexRandHexNumber:
 			return getIndexRandHexNumber();
-		case UminhoGrMib.idxRandomHexadecimalNumber:
+		case MOTableBuilder.idxRandomHexadecimalNumber:
 			return getRandomHexadecimalNumber();
 		default:
 			return super.getValue(column);
@@ -51,10 +49,10 @@ public class UnpredictableTableEntryRow extends DefaultMOMutableRow2PC {
 	public void setValue(int column, Variable value) {
 		
 		switch (column) {
-		case UminhoGrMib.idxIndexRandHexNumber:
+		case MOTableBuilder.idxIndexRandHexNumber:
 			setIndexRandHexNumber((Integer32) value);
 			break;
-		case UminhoGrMib.idxRandomHexadecimalNumber:
+		case MOTableBuilder.idxRandomHexadecimalNumber:
 			setRandomHexadecimalNumber((OctetString) value);
 			break;
 		default:

@@ -50,7 +50,7 @@ public class MOScalarFactory implements MOGroup{
 		paramD = moFactory.createScalar(UminhoGrMib.oidParamD,
 				moFactory.createAccess(MOAccessImpl.ACCESSIBLE_FOR_READ_ONLY), new Integer32());
 		paramAuthReset = new ParamAuthReset(UminhoGrMib.oidParamAuthReset,
-				moFactory.createAccess(MOAccessImpl.ACCESSIBLE_FOR_READ_WRITE));
+				moFactory.createAccess(MOAccessImpl.ACCESSIBLE_FOR_WRITE));
 		paramAuthReset.addMOValueValidationListener(new ParamAuthResetValidator());
 
 	}

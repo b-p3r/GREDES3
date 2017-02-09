@@ -42,6 +42,22 @@ public class ParamAuthReset extends DisplayStringScalar<OctetString> {
 		return super.setValue(newValue);
 	}
 
+
+	/* (non-Javadoc)
+	 * @see org.snmp4j.agent.mo.MOScalar#commit(org.snmp4j.agent.request.SubRequest)
+	 */
+	@Override
+	public void commit(SubRequest request) {
+		// TODO Auto-generated method stub
+		
+		Variable var = request.getRequest().get(0).getVariableBinding().getVariable();
+		System.out.println("commit :"+ var.toString());
+		//super.commit(request);
+	}
+
+
+	
+
 }
 
 // Value Validators

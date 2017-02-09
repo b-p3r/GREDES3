@@ -1,4 +1,4 @@
-package di.uminho.miei.gredes;
+package di.uminho.miei.gredes.tables;
 
 import org.snmp4j.agent.mo.MOTableRowFactory;
 import org.snmp4j.smi.OID;

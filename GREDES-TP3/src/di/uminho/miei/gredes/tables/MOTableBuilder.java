@@ -1,4 +1,4 @@
-package di.uminho.miei.gredes;
+package di.uminho.miei.gredes.tables;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +29,8 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.SMIConstants;
 import org.snmp4j.smi.Variable;
+
+import di.uminho.miei.gredes.UminhoGrMib;
 
 /**
  * 

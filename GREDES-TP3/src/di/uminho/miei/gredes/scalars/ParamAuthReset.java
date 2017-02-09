@@ -1,4 +1,4 @@
-package di.uminho.miei.gredes;
+package di.uminho.miei.gredes.scalars;
 
 import org.snmp4j.agent.MOAccess;
 import org.snmp4j.agent.mo.MOValueValidationEvent;

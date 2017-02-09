@@ -1,4 +1,4 @@
-package di.uminho.miei.gredes;
+package di.uminho.miei.gredes.scalars;
 
 import org.snmp4j.agent.DuplicateRegistrationException;
 import org.snmp4j.agent.MOGroup;
@@ -10,6 +10,8 @@ import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
+
+import di.uminho.miei.gredes.UminhoGrMib;
 
 public class MOScalarFactory implements MOGroup{
 

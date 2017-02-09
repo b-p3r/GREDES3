@@ -1,10 +1,12 @@
-package di.uminho.miei.gredes;
+package di.uminho.miei.gredes.tables;
 
 import org.snmp4j.agent.mo.DefaultMOMutableRow2PC;
 import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
+
+import di.uminho.miei.gredes.UminhoGrMib;
 
 public class UnpredictableTableEntryRow extends DefaultMOMutableRow2PC {
 

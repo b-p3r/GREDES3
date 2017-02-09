@@ -1,4 +1,4 @@
-package di.uminho.miei.gredes;
+package di.uminho.miei.gredes.agent;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +28,9 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.transport.TransportMappings;
+
+import di.uminho.miei.gredes.scalars.MOScalarFactory;
+import di.uminho.miei.gredes.tables.MOTableBuilder;
 
 public class Agent extends BaseAgent {
 

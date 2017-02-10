@@ -37,6 +37,8 @@ public class Agent extends BaseAgent {
 
 	static Agent agent;
 
+	private static AgentHelper agentHelper;
+
 	private String address;
 
 	public Agent(String address) throws IOException {
@@ -94,12 +96,13 @@ public class Agent extends BaseAgent {
 	@Override
 	protected void addViews(VacmMIB vacm) {
 
-		vacm.addGroup(SecurityModel.SECURITY_MODEL_SNMPv2c, new OctetString("cunpredictable"),
+		vacm.addGroup(SecurityModel.SECURITY_MODEL_SNMPv2c, new OctetString("c" + agentHelper.getCommunityString()),
 				new OctetString("v1v2group"), StorageType.nonVolatile);
 
-		vacm.addAccess(new OctetString("v1v2group"), new OctetString("unpredictable"), SecurityModel.SECURITY_MODEL_ANY,
-				SecurityLevel.NOAUTH_NOPRIV, MutableVACM.VACM_MATCH_EXACT, new OctetString("fullReadView"),
-				new OctetString("fullWriteView"), new OctetString("fullNotifyView"), StorageType.nonVolatile);
+		vacm.addAccess(new OctetString("v1v2group"), new OctetString(agentHelper.getCommunityString()),
+				SecurityModel.SECURITY_MODEL_ANY, SecurityLevel.NOAUTH_NOPRIV, MutableVACM.VACM_MATCH_EXACT,
+				new OctetString("fullReadView"), new OctetString("fullWriteView"), new OctetString("fullNotifyView"),
+				StorageType.nonVolatile);
 
 		vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3.6.1.3.99.5"), new OctetString(),
 				VacmMIB.vacmViewIncluded, StorageType.nonVolatile);
@@ -143,7 +146,7 @@ public class Agent extends BaseAgent {
 		// unexpected behavior.
 		// loadConfig(ImportModes.REPLACE_CREATE);
 		addShutdownHook();
-		getServer().addContext(new OctetString("unpredictable"));
+		getServer().addContext(new OctetString(agentHelper.getCommunityString()));
 		finishInit();
 		run();
 		sendColdStartNotification();
@@ -160,11 +163,14 @@ public class Agent extends BaseAgent {
 	 * We only configure one, "unpredictable".
 	 */
 	protected void addCommunities(SnmpCommunityMIB communityMIB) {
-		Variable[] com2sec = new Variable[] { new OctetString("unpredictable"), // community
-																				// name
-				new OctetString("cunpredictable"), // security name
+		Variable[] com2sec = new Variable[] { new OctetString(agentHelper.getCommunityString()), // community
+				// name
+				new OctetString("c" + agentHelper.getCommunityString()), // security
+																			// name
 				getAgent().getContextEngineID(), // local engine ID
-				new OctetString("unpredictable"), // default context name
+				new OctetString(agentHelper.getCommunityString()), // default
+																	// context
+																	// name
 				new OctetString(), // transport tag
 				new Integer32(StorageType.nonVolatile), // storage type
 				new Integer32(RowStatus.active) // row status
@@ -176,7 +182,7 @@ public class Agent extends BaseAgent {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
-		AgentHelper agentHelper = new AgentHelper("resources/unpredictable-conf.txt", args[0]);
+		agentHelper = new AgentHelper("resources/unpredictable-conf.txt", args[0]);
 
 		String address = "0.0.0.0/" + agentHelper.getUdpPort();
 		Agent agent = new Agent(address);
@@ -206,7 +212,8 @@ public class Agent extends BaseAgent {
 
 		while (true) {
 			System.out.println("Agent running...");
-			Thread.sleep(5000);
+			agentHelper.refresh(moTableBuilder);
+			Thread.sleep(agentHelper.getRefreshingTime());
 		}
 	}
 }

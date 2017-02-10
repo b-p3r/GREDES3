@@ -16,12 +16,11 @@ import org.snmp4j.smi.Variable;
 
 import di.uminho.miei.gredes.tables.MOTableBuilder;
 
-
 /**
  * 
  * @author Bruno Pereira
  * 
- * @date 2017 
+ * @date 2017
  *
  */
 public class AgentHelper {
@@ -54,6 +53,8 @@ public class AgentHelper {
 		this.pathToConfFile = pathToConfFile;
 		this.resetKey = resetKey;
 		this.loadConf(this.pathToConfFile);
+		this.refreshingTime = 0;
+		this.waitingTime = 0;
 	}
 
 	/**
@@ -61,7 +62,7 @@ public class AgentHelper {
 	 * @param moTableBuilder
 	 * @throws InterruptedException
 	 */
-	public synchronized void refresh(MOTableBuilder moTableBuilder) throws InterruptedException{
+	public synchronized void refresh(MOTableBuilder moTableBuilder) throws InterruptedException {
 		synchronized (moTableBuilder) {
 			while (this.isReset == true)
 				onReset.await();
@@ -136,7 +137,7 @@ public class AgentHelper {
 			for (Iterator<?> iterator = moTableBuilder.getUnpredictableTableEntry().getColumns()[1].getTable()
 					.getModel().iterator(); iterator.hasNext();) {
 				DefaultMOMutableRow2PC type = (DefaultMOMutableRow2PC) iterator.next();
-				type.setValue(0, new Integer32(a+1));
+				type.setValue(0, new Integer32(a + 1));
 				type.setValue(1, new OctetString(toReturn[a]));
 				a++;
 
@@ -158,7 +159,6 @@ public class AgentHelper {
 			agent.unregisterManagedObject(moTableBuilder);
 
 			ArrayList<String> seed = loadSeed();
-			
 
 			for (String string : seed) {
 				moTableBuilder.addRowValue((Variable) new OctetString(string));
@@ -185,10 +185,9 @@ public class AgentHelper {
 
 		ArrayList<String> seed = new ArrayList<>();
 		try {
-			// TODO: aplicar caminho do ficheiro de conf
-			// BufferedReader br = new BufferedReader(new
-			// FileReader(getPathToInitSeed()));
-			BufferedReader br = new BufferedReader(new FileReader("resources/first-map-table.txt"));
+
+			BufferedReader br = new BufferedReader(new FileReader(getPathToInitSeed()));
+
 			try {
 
 				String line = br.readLine();
@@ -261,7 +260,6 @@ public class AgentHelper {
 	 * @param b
 	 */
 	private void substitution(int i, int j, int n, int d, int[][] b) {
-		
 
 		/**
 		 * Conversão de índices para índices base 0 e salvaguardas de introdução
@@ -302,7 +300,6 @@ public class AgentHelper {
 		belowrow = (i >= (n - 1)) ? 0 : i + 1;
 		backcol = (j == 0) ? (d - 1) : j - 1;
 		frontcol = (j >= (d - 1)) ? 0 : j + 1;
-
 
 		ArrayList<Integer> colToCalc = new ArrayList<>();
 		ArrayList<Integer> rowToCalc = new ArrayList<>();

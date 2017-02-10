@@ -6,34 +6,66 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 
+
+/**
+ * 
+ * @author Bruno Pereira
+ * 
+ * @date 2017 
+ *
+ */
 public class UnpredictableTableEntryRow extends DefaultMOMutableRow2PC {
 
 	
 
+	/**
+	 * 
+	 * @param index
+	 * @param values
+	 */
 	public UnpredictableTableEntryRow(OID index, Variable[] values) {
 		super(index, values);
 		
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Integer32 getIndexRandHexNumber() {
 		
 		return (Integer32) super.getValue(MOTableBuilder.idxIndexRandHexNumber);
 	}
 
+	/**
+	 * 
+	 * @param newColValue
+	 */
 	public void setIndexRandHexNumber(Integer32 newColValue) {
 		
 		super.setValue(MOTableBuilder.idxIndexRandHexNumber, newColValue);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public OctetString getRandomHexadecimalNumber() {
 		return (OctetString) super.getValue(MOTableBuilder.idxRandomHexadecimalNumber);
 	}
 
+	/**
+	 * 
+	 * @param newColValue
+	 */
 	public void setRandomHexadecimalNumber(OctetString newColValue) {
 	
 		super.setValue(MOTableBuilder.idxRandomHexadecimalNumber, newColValue);
 	}
 
+	/**
+	 * 
+	 */
 	public Variable getValue(int column) {
 		
 		switch (column) {
@@ -46,6 +78,9 @@ public class UnpredictableTableEntryRow extends DefaultMOMutableRow2PC {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	public void setValue(int column, Variable value) {
 		
 		switch (column) {

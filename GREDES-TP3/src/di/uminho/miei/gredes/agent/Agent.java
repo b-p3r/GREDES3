@@ -197,7 +197,7 @@ public class Agent extends BaseAgent {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
-		AgentHelper agentHelper = new AgentHelper("resources/unpredictable-conf.txt", args[0]);
+		AgentHelper agentHelper = new AgentHelper(args[1], args[0]);
 
 		String address = "0.0.0.0/" + agentHelper.getUdpPort();
 		Agent agent = new Agent(address, agentHelper.getCommunityString());

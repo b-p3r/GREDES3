@@ -66,7 +66,6 @@ public class AgentHelper {
 		synchronized (moTableBuilder) {
 			while (this.isReset == true)
 				onReset.await();
-			System.out.println("refreshing ..................");
 
 			int N = this.getEntryN();
 			int D = this.getNumberD();

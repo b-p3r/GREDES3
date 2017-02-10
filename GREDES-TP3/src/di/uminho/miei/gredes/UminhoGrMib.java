@@ -3,6 +3,14 @@ package di.uminho.miei.gredes;
 
 import org.snmp4j.smi.OID;
 
+
+/**
+ * 
+ * @author Bruno Pereira
+ * 
+ * @date 2017 
+ *
+ */
 public class UminhoGrMib
 
 {

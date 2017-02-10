@@ -34,15 +34,16 @@ import di.uminho.miei.gredes.UminhoGrMib;
 
 /**
  * 
- * @author bpereira
+ * @author Bruno Pereira
+ * 
+ * @date 2017 
  *
  */
 @SuppressWarnings("rawtypes")
-public class MOTableBuilder implements MOGroup{
+public class MOTableBuilder implements MOGroup {
 
 	private MOTableSubIndex[] unpredictableTableEntryIndexes;
 	private MOTableIndex unpredictableTableEntryIndex;
-
 
 	private MOTable<UnpredictableTableEntryRow, MOColumn, MOTableModel<UnpredictableTableEntryRow>> unpredictableTableEntry;
 	private MOTableModel<UnpredictableTableEntryRow> unpredictableTableEntryModel;
@@ -68,22 +69,27 @@ public class MOTableBuilder implements MOGroup{
 		this.moFactory = moFactory;
 	}
 
+	/**
+	 * 
+	 * @param variable
+	 */
 	public void addRowValue(Variable variable) {
-		
+
 		tableRows.add(new Variable[2]);
-		tableRows.get(currentRow)[idxIndexRandHexNumber] = new Integer32(currentRow+1);
+		tableRows.get(currentRow)[idxIndexRandHexNumber] = new Integer32(currentRow + 1);
 		tableRows.get(currentRow)[idxRandomHexadecimalNumber] = variable;
 
 		currentRow++;
 
 	}
-	
-	
 
+	/**
+	 * 
+	 */
 	public void build() {
 		// Index definition
 		unpredictableTableEntryIndexes = new MOTableSubIndex[] {
-				moFactory.createSubIndex(UminhoGrMib.oidIndexRandHexNumber, SMIConstants.SYNTAX_INTEGER, 1, 1) };
+				moFactory.createSubIndex(UminhoGrMib.oidIndexRandHexNumber, SMIConstants.SYNTAX_INTEGER, 1, 256) };
 
 		unpredictableTableEntryIndex = moFactory.createIndex(unpredictableTableEntryIndexes, false,
 				new MOTableIndexValidator() {
@@ -121,21 +127,28 @@ public class MOTableBuilder implements MOGroup{
 		int i = 1;
 
 		for (Variable[] variables : tableRows) {
-			unpredictableTableEntry.addRow(new UnpredictableTableEntryRow(new OID(String.valueOf(i)), variables));
+			
+			if (variables[1] != null) {
+				
+				unpredictableTableEntry
+						.addRow(new UnpredictableTableEntryRow(new OID(String.valueOf(i)), variables));
 
-			i++;
+				i++;
+			}
+
 		}
-		
+
 		currentRow = 0;
 
 	}
-	
-	
 
-	public MOTable<UnpredictableTableEntryRow,MOColumn,MOTableModel<UnpredictableTableEntryRow>> getUnpredictableTableEntry() {
-	    return unpredictableTableEntry;
-	  }
-
+	/**
+	 * 
+	 * @return
+	 */
+	public MOTable<UnpredictableTableEntryRow, MOColumn, MOTableModel<UnpredictableTableEntryRow>> getUnpredictableTableEntry() {
+		return unpredictableTableEntry;
+	}
 
 	/**
 	 * The <code>RandomHexadecimalNumberValidator</code> implements the value
@@ -154,16 +167,22 @@ public class MOTableBuilder implements MOGroup{
 		}
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public void registerMOs(MOServer server, OctetString context) throws DuplicateRegistrationException {
 		server.register(this.unpredictableTableEntry, context);
-		
+
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public void unregisterMOs(MOServer server, OctetString context) {
 		server.unregister(this.unpredictableTableEntry, context);
-		
+
 	}
 
 }

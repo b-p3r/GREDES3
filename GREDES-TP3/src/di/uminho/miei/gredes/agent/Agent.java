@@ -33,33 +33,44 @@ import org.snmp4j.transport.TransportMappings;
 import di.uminho.miei.gredes.scalars.MOScalarFactory;
 import di.uminho.miei.gredes.tables.MOTableBuilder;
 
+/**
+ * 
+ * @author Bruno Pereira
+ * 
+ * @date 2017 
+ *
+ */
 public class Agent extends BaseAgent {
-
-	static Agent agent;
-
-	private static AgentHelper agentHelper;
 
 	private String address;
 
-	public Agent(String address) throws IOException {
+	private String communityString;
 
-		// These files does not exist and are not used but has to be specified
-		// Read snmp4j docs for more info
+	/**
+	 * 
+	 * @param address
+	 * @param communityString
+	 * @throws IOException
+	 */
+	public Agent(String address, String communityString) throws IOException {
+
+		
 		super(new File("conf.agent"), new File("bootCounter.agent"),
 				new CommandProcessor(new OctetString(MPv3.createLocalEngineID())));
 		this.address = address;
+		this.communityString = communityString;
 	}
 
 	/**
-	 * We let clients of this agent register the MO they need so this method
-	 * does nothing
+	 * 
 	 */
 	@Override
 	protected void registerManagedObjects() {
 	}
 
 	/**
-	 * Clients can register the MO they need
+	 * 
+	 * @param mo
 	 */
 	public void registerManagedObject(ManagedObject mo) {
 		try {
@@ -69,6 +80,10 @@ public class Agent extends BaseAgent {
 		}
 	}
 
+	/**
+	 * 
+	 * @param moGroup
+	 */
 	public void registerManagedObject(MOGroup moGroup) {
 		try {
 			moGroup.registerMOs(server, null);
@@ -77,55 +92,65 @@ public class Agent extends BaseAgent {
 		}
 	}
 
+	/**
+	 * 
+	 * @param moGroup
+	 */
 	public void unregisterManagedObject(MOGroup moGroup) {
 		moGroup.unregisterMOs(server, getContext(moGroup));
 	}
 
-	/*
-	 * Empty implementation
+	/**
+	 * 
 	 */
 	@Override
 	protected void addNotificationTargets(SnmpTargetMIB targetMIB, SnmpNotificationMIB notificationMIB) {
 	}
 
 	/**
-	 * Minimal View based Access Control
-	 * 
 	 * http://www.faqs.org/rfcs/rfc2575.html
 	 */
 	@Override
 	protected void addViews(VacmMIB vacm) {
 
-		vacm.addGroup(SecurityModel.SECURITY_MODEL_SNMPv2c, new OctetString("c" + agentHelper.getCommunityString()),
+		vacm.addGroup(SecurityModel.SECURITY_MODEL_SNMPv2c, new OctetString("c" + this.communityString),
 				new OctetString("v1v2group"), StorageType.nonVolatile);
 
-		vacm.addAccess(new OctetString("v1v2group"), new OctetString(agentHelper.getCommunityString()),
+		vacm.addAccess(new OctetString("v1v2group"), new OctetString(this.communityString),
 				SecurityModel.SECURITY_MODEL_ANY, SecurityLevel.NOAUTH_NOPRIV, MutableVACM.VACM_MATCH_EXACT,
 				new OctetString("fullReadView"), new OctetString("fullWriteView"), new OctetString("fullNotifyView"),
 				StorageType.nonVolatile);
 
-		vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3.6.1.3.99.5"), new OctetString(),
+		vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3.6"), new OctetString(),
 				VacmMIB.vacmViewIncluded, StorageType.nonVolatile);
+		
+		vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3.6.1.3.99.3.4"), new OctetString(),
+				VacmMIB.vacmViewExcluded, StorageType.nonVolatile);
 
 		vacm.addViewTreeFamily(new OctetString("fullWriteView"), new OID("1.3.6.1.3.99.3.4"), new OctetString(),
 				VacmMIB.vacmViewIncluded, StorageType.nonVolatile);
 
-		vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3.6.1.3.99.3.1"), new OctetString(),
-				VacmMIB.vacmViewIncluded, StorageType.nonVolatile);
-		vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3.6.1.3.99.3.2"), new OctetString(),
-				VacmMIB.vacmViewIncluded, StorageType.nonVolatile);
-		vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3.6.1.3.99.3.3"), new OctetString(),
-				VacmMIB.vacmViewIncluded, StorageType.nonVolatile);
 
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	protected void unregisterManagedObjects() {
+	
+		
 	}
 
 	/**
-	 * User based Security Model, only applicable to SNMP v.3
 	 * 
 	 */
 	protected void addUsmUser(USM usm) {
 	}
 
+	/**
+	 * 
+	 */
 	protected void initTransportMappings() throws IOException {
 		transportMappings = new TransportMapping<?>[1];
 		Address addr = GenericAddress.parse(address);
@@ -134,70 +159,52 @@ public class Agent extends BaseAgent {
 	}
 
 	/**
-	 * Start method invokes some initialization methods needed to start the
-	 * agent
 	 * 
 	 * @throws IOException
 	 */
 	public void start() throws IOException {
 
 		init();
-		// This method reads some old config from a file and causes
-		// unexpected behavior.
-		// loadConfig(ImportModes.REPLACE_CREATE);
+		
 		addShutdownHook();
-		getServer().addContext(new OctetString(agentHelper.getCommunityString()));
+		getServer().addContext(new OctetString(this.communityString));
 		finishInit();
 		run();
 		sendColdStartNotification();
 	}
 
-	protected void unregisterManagedObjects() {
-		// here we should unregister those objects previously registered...
-	}
-
+	
 	/**
-	 * The table of community strings configured in the SNMP engine's Local
-	 * Configuration Datastore (LCD).
 	 * 
-	 * We only configure one, "unpredictable".
 	 */
 	protected void addCommunities(SnmpCommunityMIB communityMIB) {
-		Variable[] com2sec = new Variable[] { new OctetString(agentHelper.getCommunityString()), // community
+		Variable[] com2sec = new Variable[] { new OctetString(this.communityString), // community
 				// name
-				new OctetString("c" + agentHelper.getCommunityString()), // security
-																			// name
+				new OctetString("c" + this.communityString), // security
+																// name
 				getAgent().getContextEngineID(), // local engine ID
-				new OctetString(agentHelper.getCommunityString()), // default
-																	// context
-																	// name
+				new OctetString(this.communityString), // default
+														// context
+														// name
 				new OctetString(), // transport tag
 				new Integer32(StorageType.nonVolatile), // storage type
 				new Integer32(RowStatus.active) // row status
 		};
 
-		communityMIB.getSnmpCommunityEntry().addRow(communityMIB.getSnmpCommunityEntry()
-				.createRow(new OctetString("unpredictable2unpredictable").toSubIndex(true), com2sec));
+		communityMIB.getSnmpCommunityEntry().addRow(communityMIB.getSnmpCommunityEntry().createRow(
+				new OctetString(this.communityString + "2" + this.communityString).toSubIndex(true), com2sec));
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
-		agentHelper = new AgentHelper("resources/unpredictable-conf.txt", args[0]);
+		AgentHelper agentHelper = new AgentHelper("resources/unpredictable-conf.txt", args[0]);
 
 		String address = "0.0.0.0/" + agentHelper.getUdpPort();
-		Agent agent = new Agent(address);
+		Agent agent = new Agent(address, agentHelper.getCommunityString());
 		agent.start();
 
-		// Since BaseAgent registers some mibs by default we need to unregister
-		// one before we register our own sysDescr. Normally you would
-		// override that method and register the mibs that you need
+		
 		agent.unregisterManagedObject(agent.getSnmpv2MIB());
-
-		MOScalarFactory moScalarFactory = new MOScalarFactory(DefaultMOFactory.getInstance(),
-				agentHelper.getFrequencyR(), agentHelper.getEntryN(), agentHelper.getNumberD(),
-				agentHelper.getResetKey());
-
-		agent.registerManagedObject(moScalarFactory);
 
 		ArrayList<String> seed = agentHelper.loadSeed();
 
@@ -210,10 +217,22 @@ public class Agent extends BaseAgent {
 
 		agent.registerManagedObject(moTableBuilder);
 
+		MOScalarFactory moScalarFactory = new MOScalarFactory(DefaultMOFactory.getInstance(),
+				agentHelper.getFrequencyR(), agentHelper.getEntryN(), agentHelper.getNumberD(),
+				agentHelper.getResetKey(), agentHelper, agent, moTableBuilder);
+
+		agent.registerManagedObject(moScalarFactory);
+
+		
+
 		while (true) {
-			System.out.println("Agent running...");
+			System.out.println("Agente em funcionamento...");
 			agentHelper.refresh(moTableBuilder);
+			Thread.sleep(agentHelper.getWaitingTime());
+			agentHelper.setWaitingTime(0);
 			Thread.sleep(agentHelper.getRefreshingTime());
 		}
 	}
+
+	
 }

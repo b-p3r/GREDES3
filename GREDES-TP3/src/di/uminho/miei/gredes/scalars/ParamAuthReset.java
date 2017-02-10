@@ -10,14 +10,35 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 
+import di.uminho.miei.gredes.agent.Agent;
+import di.uminho.miei.gredes.agent.AgentHelper;
+import di.uminho.miei.gredes.tables.MOTableBuilder;
+
 public class ParamAuthReset extends DisplayStringScalar<OctetString> {
 
-	ParamAuthReset(OID oid, MOAccess access) {
+	private AgentHelper agentHelper;
+	private MOTableBuilder moTableBuilder;
+	private Agent agent;
+
+	/**
+	 * 
+	 * @param oid
+	 * @param access
+	 * @param agentHelper
+	 * @param agent
+	 * @param moTableBuilder
+	 */
+	ParamAuthReset(OID oid, MOAccess access, AgentHelper agentHelper, Agent agent, MOTableBuilder moTableBuilder) {
 		super(oid, access, new OctetString(), 0, 255);
+		this.agentHelper = agentHelper;
+		this.moTableBuilder = moTableBuilder;
+		this.agent = agent;
 
 	}
-	
 
+	/**
+	 * 
+	 */
 	public int isValueOK(SubRequest request) {
 		Variable newValue = request.getVariableBinding().getVariable();
 		int valueOK = super.isValueOK(request);
@@ -32,31 +53,49 @@ public class ParamAuthReset extends DisplayStringScalar<OctetString> {
 		return valueOK;
 	}
 
+	/**
+	 * 
+	 */
 	public OctetString getValue() {
 
 		return super.getValue();
 	}
 
+	/**
+	 * 
+	 */
 	public int setValue(OctetString newValue) {
 
 		return super.setValue(newValue);
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.snmp4j.agent.mo.MOScalar#commit(org.snmp4j.agent.request.SubRequest)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.snmp4j.agent.mo.MOScalar#commit(org.snmp4j.agent.request.SubRequest)
 	 */
 	@Override
 	public void commit(SubRequest request) {
-		// TODO Auto-generated method stub
-		
+		super.commit(request);
+		String key = agentHelper.getResetKey();
 		Variable var = request.getRequest().get(0).getVariableBinding().getVariable();
-		System.out.println("commit :"+ var.toString());
-		//super.commit(request);
-	}
-
-
+		String receivedKey = var.toString();
 	
+
+		if (key.equals(receivedKey)) {
+			System.out.println("RESET");
+			
+			new Runnable() {
+
+				public void run() {
+					agentHelper.reset(moTableBuilder, agent);
+					
+				}
+			}.run();
+		}
+
+	}
 
 }
 

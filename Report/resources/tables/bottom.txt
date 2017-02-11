@@ -1,0 +1,5 @@
+\bottomrule
+\end{tabular}
+\caption{Dados relativos ao \emph{goodput} após 10 medições para \%}
+\label{tab:}
+\end{table}

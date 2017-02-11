@@ -1,0 +1,40 @@
+%---------------------------------------------------------------------------------------------------------------%
+\section{Fase --- A}
+%---------------------------------------------------------------------------------------------------------------%
+
+\begin{center}
+ 	
+ 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/Alinea1/topologia.png}
+ 	\captionsetup{type=figure, width=0.8\linewidth}
+	\caption{Topologia}
+\label{fig:ssec1:topologia} 
+\end{center}
+
+
+
+\begin{listing}
+\begin{minted}{java}
+	/**
+	 * 
+	 * @param mo
+	 */
+	public void registerManagedObject(ManagedObject mo) {
+		try {
+			server.register(mo, null);
+		} catch (DuplicateRegistrationException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+\end{minted}
+\caption{Example from external file}
+\label{listing:3}
+\end{listing}
+
+
+
+
+
+
+
+
+

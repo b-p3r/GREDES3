@@ -1,0 +1,8 @@
+\begin{table}[H]
+\centering
+
+\begin{tabular}{c c c}
+\toprule
+\toprule
+	Nº Medição & T. Transferência & \emph{Throughput} \\ 
+\midrule

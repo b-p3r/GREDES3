@@ -1,9 +1,11 @@
 package di.uminho.miei.gredes.scalars;
 
+import org.snmp4j.PDU;
 import org.snmp4j.agent.MOAccess;
 import org.snmp4j.agent.mo.MOValueValidationEvent;
 import org.snmp4j.agent.mo.MOValueValidationListener;
 import org.snmp4j.agent.mo.snmp.DisplayStringScalar;
+import org.snmp4j.agent.request.RequestStatus;
 import org.snmp4j.agent.request.SubRequest;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.OID;
@@ -14,6 +16,13 @@ import di.uminho.miei.gredes.agent.Agent;
 import di.uminho.miei.gredes.agent.AgentHelper;
 import di.uminho.miei.gredes.tables.MOTableBuilder;
 
+/**
+ * 
+ * @author Bruno Pereira
+ * 
+ * @date 2017 
+ *
+ */
 public class ParamAuthReset extends DisplayStringScalar<OctetString> {
 
 	private AgentHelper agentHelper;
@@ -65,8 +74,29 @@ public class ParamAuthReset extends DisplayStringScalar<OctetString> {
 	 * 
 	 */
 	public int setValue(OctetString newValue) {
-
 		return super.setValue(newValue);
+	}
+	
+	
+	
+
+	/* (non-Javadoc)
+	 * @see org.snmp4j.agent.mo.MOScalar#prepare(org.snmp4j.agent.request.SubRequest)
+	 */
+	@Override
+	public void prepare(SubRequest request) {
+		super.prepare(request);
+		RequestStatus status = request.getStatus();
+		String key = agentHelper.getResetKey();
+		Variable var = request.getRequest().get(0).getVariableBinding().getVariable();
+		String receivedKey = var.toString();
+	
+		System.out.println("RECEIVED KEY:\t" + receivedKey);
+		System.out.println("CONFIG   KEY:\t" + key);
+		
+		if (!key.equals(receivedKey))
+			status.setErrorStatus(PDU.wrongValue);
+		
 	}
 
 	/*
@@ -78,13 +108,10 @@ public class ParamAuthReset extends DisplayStringScalar<OctetString> {
 	@Override
 	public void commit(SubRequest request) {
 		super.commit(request);
-		String key = agentHelper.getResetKey();
-		Variable var = request.getRequest().get(0).getVariableBinding().getVariable();
-		String receivedKey = var.toString();
-	
-
-		if (key.equals(receivedKey)) {
-			System.out.println("RESET");
+		
+			System.out.println("RESETING .....");
+			
+			request.setErrorStatus(0);
 			
 			new Runnable() {
 
@@ -93,9 +120,27 @@ public class ParamAuthReset extends DisplayStringScalar<OctetString> {
 					
 				}
 			}.run();
-		}
+		
 
 	}
+
+	/* (non-Javadoc)
+	 * @see org.snmp4j.agent.mo.MOScalar#cleanup(org.snmp4j.agent.request.SubRequest)
+	 */
+	@Override
+	public void cleanup(SubRequest request) {
+		super.cleanup(request);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.snmp4j.agent.mo.MOScalar#undo(org.snmp4j.agent.request.SubRequest)
+	 */
+	@Override
+	public void undo(SubRequest request) {
+		super.undo(request);
+
+	}
+	
 
 }
 

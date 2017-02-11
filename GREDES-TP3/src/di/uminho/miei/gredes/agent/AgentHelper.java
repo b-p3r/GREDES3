@@ -52,9 +52,10 @@ public class AgentHelper {
 		super();
 		this.pathToConfFile = pathToConfFile;
 		this.resetKey = resetKey;
-		this.loadConf(this.pathToConfFile);
 		this.refreshingTime = 0;
 		this.waitingTime = 0;
+		this.loadConf(this.pathToConfFile);
+
 	}
 
 	/**

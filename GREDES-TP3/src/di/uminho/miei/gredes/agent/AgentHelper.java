@@ -162,7 +162,6 @@ public class AgentHelper {
 
 			for (String string : seed) {
 				moTableBuilder.addRowValue((Variable) new OctetString(string));
-				System.out.println(string);
 
 			}
 

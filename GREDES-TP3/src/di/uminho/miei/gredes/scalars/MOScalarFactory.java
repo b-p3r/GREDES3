@@ -76,8 +76,6 @@ public class MOScalarFactory implements MOGroup {
 		this.paramAuthReset.addMOValueValidationListener(new ParamAuthResetValidator());
 		this.paramAuthReset.setValue((OctetString) getVariable(paramAuthReset));
 
-		System.out.println("create");
-
 	}
 
 	

@@ -89,7 +89,7 @@ public class MOTableBuilder implements MOGroup {
 	public void build() {
 		// Index definition
 		unpredictableTableEntryIndexes = new MOTableSubIndex[] {
-				moFactory.createSubIndex(UminhoGrMib.oidIndexRandHexNumber, SMIConstants.SYNTAX_INTEGER, 1, 256) };
+				moFactory.createSubIndex(UminhoGrMib.oidIndexRandHexNumber, SMIConstants.SYNTAX_INTEGER, 1, 1) };
 
 		unpredictableTableEntryIndex = moFactory.createIndex(unpredictableTableEntryIndexes, false,
 				new MOTableIndexValidator() {

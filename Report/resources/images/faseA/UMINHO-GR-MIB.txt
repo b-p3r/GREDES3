@@ -1,0 +1,140 @@
+UMINHO-GR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	experimental,
+	MODULE-IDENTITY,
+	OBJECT-TYPE
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC
+	OBJECT-GROUP
+		FROM SNMPv2-CONF;
+
+unpredictableMIB MODULE-IDENTITY
+	LAST-UPDATED "201701301238Z"
+	ORGANIZATION "University of Minho"
+	CONTACT-INFO
+		"- Bruno Pereira a72628@alunos.uminho.pt"
+	DESCRIPTION
+		"MIB for a random number generation server. This type of remote service over the internet will be available to other systems that need ways to get random numbers, where the latter are not controlled by internal processes, to their own computer system."
+	REVISION "201701301238Z"
+	DESCRIPTION
+		"Initial version."
+
+	-- 1.3.6.1.3.99
+	::= { experimental 99 }
+
+
+unpredictableParam OBJECT IDENTIFIER 	::= { unpredictableMIB 3 }
+
+unpredictableParamGroup OBJECT-GROUP
+	OBJECTS {
+		paramR,
+		paramD,
+		paramN,
+		paramAuthReset }
+	STATUS  current
+	DESCRIPTION
+		"Group with scalar objects that represent the operating parameters;"
+	-- 1.3.6.1.3.99.1
+	::= { unpredictableMIB 1 }
+
+unpredictableTableGroup OBJECT-GROUP
+	OBJECTS {
+		indexRandHexNumber,
+		randomHexadecimalNumber }
+	STATUS  current
+	DESCRIPTION
+		"Group with table of N random numbers;"
+	-- 1.3.6.1.3.99.2
+	::= { unpredictableMIB 2 }
+
+paramR OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	UNITS	"Hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency R of refreshing the table of random numbers (in Hz);"
+	-- 1.3.6.1.3.99.3.1
+	::= { unpredictableParam 1 }
+
+
+paramN OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"N number of entries in the random number table;"
+	-- 1.3.6.1.3.99.3.2
+	::= { unpredictableParam 2 }
+
+
+paramD OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of D hexadecimal digits of each entry in the random number table;"
+	-- 1.3.6.1.3.99.3.3
+	::= { unpredictableParam 3 }
+
+
+paramAuthReset OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Authorizations for the agent reset operation."
+	-- 1.3.6.1.3.99.3.4
+	::= { unpredictableParam 4 }
+
+
+unpredictableTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF UnpredictableTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This is the table used for storage of random sequence of hexadecimal digits"
+	-- 1.3.6.1.3.99.5
+	::= { unpredictableMIB 5 }
+
+
+indexRandHexNumber OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index for the entry of the random hexadecimal number of the table"
+	-- 1.3.6.1.3.99.5.1.1
+	::= { unpredictableTableEntry 1 }
+
+
+randomHexadecimalNumber OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Sequence of D hexadecimal digits."
+	-- 1.3.6.1.3.99.5.1.2
+	::= { unpredictableTableEntry 2 }
+
+
+unpredictableTableEntry OBJECT-TYPE
+	SYNTAX  UnpredictableTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry for the information about a specific random hexadecimal digit"
+	INDEX {
+		indexRandHexNumber }
+	::= { unpredictableTable 1 }
+
+
+UnpredictableTableEntry ::= SEQUENCE {
+
+	indexRandHexNumber      INTEGER,
+	randomHexadecimalNumber DisplayString }
+
+
+END

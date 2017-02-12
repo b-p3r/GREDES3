@@ -2,13 +2,112 @@
 \section{Fase --- B}
 %---------------------------------------------------------------------------------------------------------------%
 
+
+
+
+
+
+
+
 \begin{center}
- 	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/Alinea1/topologia.png}
+ 	 	\begin{minted}{java}
+protected void addViews(VacmMIB vacm) {
+
+		vacm.addGroup(
+			SecurityModel.SECURITY_MODEL_SNMPv2c, //Security Model
+			new OctetString("c" + this.communityString), // Security Name
+			new OctetString("v1v2group"), //Group Name
+			StorageType.nonVolatile); // Storage type
+
+		vacm.addAccess(
+			new OctetString("v1v2group"), //Group Name
+			new OctetString(this.communityString),// Context Prefix
+			SecurityModel.SECURITY_MODEL_ANY, // Security Model
+			SecurityLevel.NOAUTH_NOPRIV, Security Level
+			MutableVACM.VACM_MATCH_EXACT, // Match
+				new OctetString("fullReadView"),  // Read View
+			new OctetString("fullWriteView"),  // Write View
+			new OctetString("fullNotifyView"), // Notify View
+				StorageType.nonVolatile); // Storage type
+
+		vacm.addViewTreeFamily(
+			new OctetString("fullReadView"), // View Name 
+			new OID("1.3.6"), // Subtree
+			new OctetString(), // Mask
+				VacmMIB.vacmViewIncluded, // Type 
+			StorageType.nonVolatile);// Storage type
+		
+		vacm.addViewTreeFamily(
+			new OctetString("fullReadView"), // View Name 
+			new OID("1.3.6.1.3.99.3.4"), // Subtree
+			new OctetString(),  // Mask
+				VacmMIB.vacmViewExcluded, // Type 
+			StorageType.nonVolatile);  // Storage type
+
+		vacm.addViewTreeFamily(
+			new OctetString("fullWriteView"),  // View Name 
+			new OID("1.3.6.1.3.99.3.4"), // Subtree
+			new OctetString(),  // Mask
+				VacmMIB.vacmViewIncluded, // Type 
+			StorageType.nonVolatile); // Storage type
+
+
+	}
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
-	\caption{Topologia}
-\label{fig:ssec1:topologia} 
+	\caption{Configuração do VACM \emph{View Access Control Model}}
+\label{fig:faseb:} 
 \end{center}
+
+\newpage
+\begin{center}
+ 	 	\begin{minted}{java}
+protected void addCommunities(SnmpCommunityMIB communityMIB) {
+		Variable[] com2sec = new Variable[] { 
+			new OctetString(this.communityString), // community name
+				new OctetString("c" + this.communityString), // security name
+				getAgent().getContextEngineID(), // local engine ID
+				new OctetString(this.communityString), // default context name
+				new OctetString(), // transport tag
+				new Integer32(StorageType.nonVolatile), // storage type
+				new Integer32(RowStatus.active) // row status
+		};
+
+		communityMIB.getSnmpCommunityEntry().addRow(
+       communityMIB.getSnmpCommunityEntry().createRow(
+				new OctetString(this.communityString + "2" + this.communityString).toSubIndex(true), 
+               com2sec));
+\end{minted}
+ 	\captionsetup{type=figure, width=0.8\linewidth}
+	\caption{Configuração do VACM \emph{View Access Control Model}}
+\label{fig:faseb:} 
+\end{center}
+
+
+
+\begin{center}
+ 	 	\begin{minted}{java}
+
+	//Exemplo da criação do parâmetro D
+  this.paramD = moFactory.createScalar(
+					UminhoGrMib.oidParamD,
+					moFactory.createAccess(MOAccessImpl.ACCESSIBLE_FOR_READ_ONLY), 
+					(Integer32) getVariable(paramD));
+
+	//Exemplo da criação do parâmetro da chave de segurança
+		this.paramAuthReset = new ParamAuthReset(
+					UminhoGrMib.oidParamAuthReset,
+				moFactory.createAccess(MOAccessImpl.ACCESSIBLE_FOR_WRITE), 
+				agentHelper, agent,
+				moTableBuilder);
+		this.paramAuthReset.addMOValueValidationListener(new ParamAuthResetValidator());
+		this.paramAuthReset.setValue((OctetString) getVariable(paramAuthReset));
+\end{minted}
+ 	\captionsetup{type=figure, width=0.8\linewidth}
+	\caption{Configuração do VACM \emph{View Access Control Model}}
+\label{fig:faseb:} 
+\end{center}
+
 
 
 

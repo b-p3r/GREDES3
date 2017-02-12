@@ -23,8 +23,8 @@ cleanaux:
 clean: cleanaux
 	rm -rf *.pdf
 
-relatorio: relatorio.pdf
-	xreader relatorio.pdf &> /dev/null &
+relatorio: clean relatorio.pdf cleanaux
+#	xreader relatorio.pdf &> /dev/null &
 
 
 relatorio.pdf:  main.tex 

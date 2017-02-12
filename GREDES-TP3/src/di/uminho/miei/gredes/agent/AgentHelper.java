@@ -63,7 +63,7 @@ public class AgentHelper {
 	 * @param moTableBuilder
 	 * @throws InterruptedException
 	 */
-	public synchronized void refresh(MOTableBuilder moTableBuilder) throws InterruptedException {
+	public void refresh(MOTableBuilder moTableBuilder) throws InterruptedException {
 		synchronized (moTableBuilder) {
 			while (this.isReset == true)
 				onReset.await();

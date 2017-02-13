@@ -132,9 +132,11 @@ pdfpagelayout=TwoPageRight
 
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{4}
-\setlength{\parindent}{4em}
+\setlength{\parindent}{2em}
 \setlength{\parskip}{1em}
-\renewcommand{\baselinestretch}{2.0}
+\renewcommand{\baselinestretch}{1.2}
+
+\newenvironment{longlisting}{\captionsetup{type=listing}}{}
 
 
 %--- Custom Appendice ---%
@@ -172,12 +174,12 @@ pdfpagelayout=TwoPageRight
 \clearpage
 % ----------- %
 %\bibauthoryear
-\nocite{*}
-\bibliography{IEEEabrv,referencias}
+%\nocite{*}
+%\bibliography{IEEEabrv,referencias}
 %\bibliography{referencias}{}
-\bibliographystyle{IEEEtran}
+%\bibliographystyle{IEEEtran}
 %\bibliographystyle{ieeetr}
-\clearpage
+%\clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

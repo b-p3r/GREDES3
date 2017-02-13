@@ -23,15 +23,17 @@ menos numa definição de grupo, seja ela, \texttt{OBJECT-GROUP} ou
 como está na \emph{Figura~\ref{fig:fasea:arvoreoids}}. 
 
 
+
+ 
 \begin{center}
  	
-	\includegraphics[scale=0.75,keepaspectratio]{resources/images/faseA/arvoreOID.png}
+	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/arvoreOID.png}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Árvore de OIDs}
 \label{fig:fasea:arvoreoids} 
 \end{center}
 
-\newpage
+
 
 Em seguida procedeu-se à redação da MIB, com a consequente validação no software
 \emph{MibDesigner}. Em primeiro lugar definiram as convenções textuais e tipos
@@ -44,13 +46,23 @@ figura \emph{FIgura~\ref{fig:fasea:imports}}.
 
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/imports.png}
+\begin{minted}{text}
+IMPORTS
+	experimental,
+	MODULE-IDENTITY,
+	OBJECT-TYPE
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC
+	OBJECT-GROUP
+		FROM SNMPv2-CONF;
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{\emph{Imports} }
 \label{fig:fasea:imports} 
 \end{center}
 
-\newpage
+
 
 Definiu-se, também o módulo da MIB, com o nome
 \texttt{unpredictableMIB}. Este tem, para além do número identificador uma série
@@ -59,13 +71,27 @@ definição pode ser verificada na \emph{Figura~\ref{fig:fasea:modulo}}.
 
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/modulo.png}
+\begin{minted}{text}
+unpredictableMIB MODULE-IDENTITY
+	LAST-UPDATED "201701301238Z"
+	ORGANIZATION "University of Minho"
+	CONTACT-INFO
+		"- Bruno Pereira a72628@alunos.uminho.pt"
+	DESCRIPTION
+		"MIB for a random number generation server. This type of remote service over the internet will be available to other systems that need ways to get random numbers, where the latter are not controlled by internal processes, to their own computer system."
+	REVISION "201701301238Z"
+	DESCRIPTION
+		"Initial version."
+
+	-- 1.3.6.1.3.99
+	::= { experimental 99 }
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Módulo \texttt{unpredictableMIB} }
 \label{fig:fasea:modulo} 
 \end{center}
 
-
+\newpage
 
 Seguidamente, definiram os \texttt{OBJECT-GROUP} incluindo os objetos em cada
 grupo, respetivamente. Note-se que, a ordem porque está esta declaração, tem
@@ -78,22 +104,47 @@ como se poderá ver em seguida, não faz sentido adicionar um nível intermédio
 
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/groups.png}
+\begin{minted}{text}
+unpredictableParamGroup OBJECT-GROUP
+	OBJECTS {
+		paramR,
+		paramD,
+		paramN,
+		paramAuthReset }
+	STATUS  current
+	DESCRIPTION
+		"Group with scalar objects that represent the operating parameters;"
+	-- 1.3.6.1.3.99.1
+	::= { unpredictableMIB 1 }
+
+unpredictableTableGroup OBJECT-GROUP
+	OBJECTS {
+		indexRandHexNumber,
+		randomHexadecimalNumber }
+	STATUS  current
+	DESCRIPTION
+		"Group with table of N random numbers;"
+	-- 1.3.6.1.3.99.2
+	::= { unpredictableMIB 2 }
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Grupos necessários}
 \label{fig:fasea:groups} 
 \end{center}
 
-\newpage
+
 
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/scalars/groupid.png}
+\begin{minted}{text}
+unpredictableParam OBJECT IDENTIFIER 	::= { unpredictableMIB 3 }
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Definição do identificador de grupo de escalares}
 \label{fig:fasea:groupid} 
 \end{center}
 
+\newpage
 Depois adicionaram-se os escalares para os parâmetros de funcionamento do
 agente. Estes objetos são todos \emph{read-only}, exceto o \emph{paramAuthReset}
 que é \emph{read-write}. Note-se que o \emph{MibDesigner} não possuía a opção
@@ -103,7 +154,17 @@ do código do agente, seja da definição da VACM, seja no acesso do objeto.
 
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/scalars/paramR.png}
+\begin{minted}{text}
+paramR OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	UNITS	"Hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency R of refreshing the table of random numbers (in Hz);"
+	-- 1.3.6.1.3.99.3.1
+	::= { unpredictableParam 1 }
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Escalar para refrescamento (parâmetro R)}
 \label{fig:fasea:} 
@@ -111,23 +172,53 @@ do código do agente, seja da definição da VACM, seja no acesso do objeto.
 
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/scalars/paramD.png}
+\begin{minted}{text}
+paramD OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of D hexadecimal digits of each entry in the random number table;"
+	-- 1.3.6.1.3.99.3.3
+	::= { unpredictableParam 3 }
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Escalar para número de dígitos hexadecimais (parâmetro D)}
 \label{fig:fasea:} 
 \end{center}
 
+
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/scalars/paramN.png}
+\begin{minted}{text}
+paramN OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"N number of entries in the random number table;"
+	-- 1.3.6.1.3.99.3.2
+	::= { unpredictableParam 2 }
+
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Escalar para número de linhas da tabela (parâmetro N)}
 \label{fig:fasea:} 
 \end{center}
-
+\newpage
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/scalars/paramAuthReset.png}
+\begin{minted}{text}
+paramAuthReset OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Authorizations for the agent reset operation."
+	-- 1.3.6.1.3.99.3.4
+	::= { unpredictableParam 4 }
+
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Escalar para chave de autenticação para \emph{reset} }
 \label{fig:fasea:} 
@@ -140,7 +231,16 @@ com o índice da tabela e o número hexadecimal associado.
 
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/tables/table.png}
+\begin{minted}{text}
+unpredictableTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF UnpredictableTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This is the table used for storage of random sequence of hexadecimal digits"
+	-- 1.3.6.1.3.99.5
+	::= { unpredictableMIB 5 }
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Identificador de grupo e da tabela}
 \label{fig:fasea:} 
@@ -148,29 +248,58 @@ com o índice da tabela e o número hexadecimal associado.
 
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/tables/tableentry.png}
+\begin{minted}{text}
+unpredictableTableEntry OBJECT-TYPE
+	SYNTAX  UnpredictableTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry for the information about a specific random hexadecimal digit"
+	INDEX {
+		indexRandHexNumber }
+	::= { unpredictableTable 1 }
+
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Definição do tipo da entrada de tabela}
 \label{fig:fasea:} 
 \end{center}
 
-\newpage
+
 O objeto representativo do índice da tabela, foi definido como \emph{read-only}
 e um inteiro entre 1 e 1000. Por sua vez, o objeto representativo do número
 hexadecimal foi definido como \emph{read-write}, por motivos aqui já mencionados
 e o seu tipo como um \emph{DisplayString}. 
 
 \begin{center}
- 	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/tables/indextable.png}
+
+\begin{minted}{text}
+ indexRandHexNumber OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index for the entry of the random hexadecimal number of the table"
+	-- 1.3.6.1.3.99.5.1.1
+	::= { unpredictableTableEntry 1 }
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Escalar para indexação da tabela}
 \label{fig:fasea:} 
 \end{center}
-
+\newpage
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/tables/hexadecimalnumber.png}
+\begin{minted}{text}
+randomHexadecimalNumber OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Sequence of D hexadecimal digits."
+	-- 1.3.6.1.3.99.5.1.2
+	::= { unpredictableTableEntry 2 }
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Escalar para representação de um número hexadecimal}
 \label{fig:fasea:} 
@@ -178,13 +307,18 @@ e o seu tipo como um \emph{DisplayString}.
 
 \begin{center}
  	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/faseA/mib/tables/tableentrydefinition.png}
+ \begin{minted}{text}
+UnpredictableTableEntry ::= SEQUENCE {
+
+	indexRandHexNumber      INTEGER,
+	randomHexadecimalNumber DisplayString }
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
 	\caption{Declaração do tipo da entrada da tabela de números hexadecimais}
 \label{fig:fasea:} 
 \end{center}
 
-
+A MIB completa pode ser consultada no \emph{Apêndice~\ref{appendix:mib}}, na pág.~\pageref{appendix:mib}.
 
 
 

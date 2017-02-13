@@ -2,16 +2,167 @@
 \section{Fase --- D}
 %---------------------------------------------------------------------------------------------------------------%
 
+Nesta fase, requere-se que se implemente a funcionalidade de refrescamento da
+tabela de números hexadecimais, em intervalos de $\frac{1}{R}$ segundos, onde
+\texttt{R} é o rácio de refrescamento em \emph{Hertz}.  Para o refrescamento,
+considere-se $M_{T,K}$, onde $N=T$, $D=K$, e a matriz é circular, ou seja cada
+coluna e cada linha é uma \emph{buffer} circular. Em consequência devem ser
+aplicados os seguintes passos:
+
+\begin{enumerate}
+	\item $X$ é somatório do valor binário de todos os símbolos de chave de
+		da operação de \emph{reset} (cada símbolo tem oito bits);
+
+	\item$S_1$ é somatório do valor decimal de todos os dígitos $d_{i,j}$ de $M$ em
+		que $i$ e $j$ são ambos pares;
+
+	\item$S_2$ é somatório do valor decimal de todos os dígitos $d_{i,j}$ de $M$
+		em que $i$ e $j$ são ambos ímpares;
+
+	\item$C$ é igual ao resto da divisão inteira de $(S_1 + X)$ por
+		$D$;\footnote{\emph{No enunciado $D$ estava trocado por $N$}}
+                                                               
+	\item$L$ é igual ao resto da divisão inteira de $(S_2 + X)$ por
+		$N$;\footnote{\emph{ibidem}}
+
+	\item Aplicar o refrescamento vertical   $v(C+1,1,M)$;
+
+	\item Aplicar o refrescamento horizontal $h(L+1,1,M)$;
+
+	\item Aplicar a operação de substituição $s(L+1,C+2,M)$;\footnote{\emph{No
+		enunciado estava $s(L,C+2,M)$. No entanto, de acordo com a definição $L$ tem
+	que ser maior ou igual a 1}}
+\end{enumerate}
+
+
+\newpage
+
+As definições das operações $v$, $h$ e $s$ figuram a seguir:
+
+\begin{itemize}
+	\item$v(i, j, M_{T,K}$) 
+	\item$h(i, j, M_{T,K}$)  
+	\item $s(i, j, M_{T,K}$)
+		\begin{itemize}
+  \item Substituição da linha $i$ pelo resultado do \texttt{XOR} da linha: 
+		\begin{itemize}
+			\item $\begin{cases}
+					\text{Se } i = 1~\text{Então}~i - 1 = T\\
+					      i -1~\text{Caso contrário}
+				     \end{cases}$ 
+			\item $\begin{cases}
+					\text{Se } i = T~\text{Então}~i + 1 = 1\\
+					      i + 1~\text{Caso contrário}
+				     \end{cases}$ 
+		\end{itemize}
+	\item  Substituição da coluna $j$ pelo resultado do \texttt{XOR} da coluna: 
+		\begin{itemize}
+			\item $\begin{cases}
+					\text{Se } j = 1~\text{Então}~j - 1 = K\\
+					      j - 1~\text{Caso contrário}
+				     \end{cases}$ 
+			\item $\begin{cases}
+					\text{Se } j = K~\text{Então}~j + 1 = 1\\
+					      j + 1~\text{Caso contrário}
+				     \end{cases}$ 
+		\end{itemize}
+		\end{itemize}
+\end{itemize}
+
+
+As funcionalidades do \emph{refreshing} da tabela de números hexadecimais são
+externas aos objetos da MIB, na medida que pertencem à classe
+\emph{AgentHelper}, mas são partilhadas por processos que escrevem e leem dos
+objetos, neste caso, a tabela de números hexadecimais. Assim, decidiu-se
+adicionar 5 métodos e uma variável de instância na classe mencionada,i\.e,
+os métodos \texttt{horizontal}, \texttt{vertical}, \texttt{substitution},
+\texttt{refresh} e o tempo de refrescamento.
+
+O tempo de refrescamento é calculado, logo na instanciação do
+\emph{AgentHelper}, sendo mantido durante toda a execução do agente. O método
+\texttt{refresh} aplica os cálculos já descritos acima, bem como a aplicação do
+dos métodos \texttt{horizontal}, \texttt{vertical}, \texttt{substitution},
+baseados em $v(i, j, M_{T,K}$), $h(i, j, M_{T,K}$), $s(i, j, M_{T,K}$),
+respetivamente. Note-se que, se teve que se proceder à conversão de índices base
+1, para índices base 0. Os valores da tabela da MIB são obtidos através de um
+iterador e colocados num \emph{array} de \emph{strings} temporário, e das
+manipulações numa matriz, obtida para o efeito da tabela, colocado de novo num
+\emph{array} de \emph{strings} e com outro iterador alteram-se os valores com
+os valores do último \emph{array}. 
+
+\newpage
+
+A \emph{Figura~\ref{fig:fasec:calcx}} representa o trecho de código onde foi
+implementado o cálculo de $X$. Cada caractere em JAVA corresponde a um
+\emph{byte}, ou seja, 8 bits, podendo somar-se diretamente ao estilo da
+linguagem de programação C. 
+
 \begin{center}
- 	
- 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{resources/images/Alinea1/topologia.png}
+\begin{minted}{java}
+for (int i = 0; i < this.getResetKey().length(); i++) {
+	X += this.getResetKey().charAt(i);
+}
+\end{minted}
  	\captionsetup{type=figure, width=0.8\linewidth}
-	\caption{Topologia}
-\label{fig:ssec1:topologia} 
+	\caption{Cálculo de $X$}
+\label{fig:fasec:calcx} 
 \end{center}
 
 
+A \emph{Figura~\ref{fig:fasec:s1s2}} corresponde ao cálculo de $S_1$ e $S_2$,
+vem como constrói uma matriz de inteiros, entre 0 e 15 (valores decimais
+possíveis de um dígito hexadecimal), para as operações de deslocamento
+e substituição.
+
+\begin{center}
+\begin{minted}{java}
+for (int i = 0; i < N; i++) {
+	for (int j = 0; j < D; j++) {
+
+		m[i][j] = Integer.parseInt(seed[i].charAt(j) + "", 16);
+		if (((i % 2) == 0) && ((j % 2) == 0)) {
+			S1 += Integer.parseInt(seed[i].charAt(j) + "", 16);
+		} else if (((i % 2) != 0) && ((j % 2) != 0)) {
+			S2 += Integer.parseInt(seed[i].charAt(j) + "", 16);
+		}
+
+	}
+
+}
+
+\end{minted}
+ 	\captionsetup{type=figure, width=0.8\linewidth}
+	\caption{Cálculo de $S_1$, $S_2$ e construção de matriz de inteiros}
+\label{fig:fasec:s1s2} 
+\end{center}
+
+O cálculo de $C$ e $L$ figura abaixo.
+
+\begin{center}
+\begin{minted}{java}
+int C = (S1 + X) % D;
+int L = (S2 + X) % N;
+\end{minted}
+ 	\captionsetup{type=figure, width=0.8\linewidth}
+	\caption{Cálculo de $C$ e $L$}
+\label{fig:fasec:} 
+\end{center}
 
 
+A \emph{Figura~\ref{fig:fasec:ops}} representa a aplicação das operações. 
 
+\begin{center}
+\begin{minted}{java}
+vertical(C + 1, 1, N, m);
+horizontal(L + 1, 1, D, m);
+substitution(L + 1, C + 2, N, D, m);
+\end{minted}
+ 	\captionsetup{type=figure, width=0.8\linewidth}
+	\caption{Aplicação de \texttt{vertical}, \texttt{horizontal}
+	e \texttt{substitution}}
+\label{fig:fasec:ops} 
+\end{center}
 
+No método \texttt{main}, no ciclo infinito, aplica-se a operação de
+\emph{refresh}, sendo o processo pausado durante o tempo de refrescamento
+previamente calculado.

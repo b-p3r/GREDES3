@@ -18,7 +18,7 @@ cleanaux:
 	rm -rf *.blg
 	rm -rf *.lof
 	rm -rf *.out
-	rm -fr _minted-rel
+	rm -fr _minted-main
 
 clean: cleanaux
 	rm -rf *.pdf
